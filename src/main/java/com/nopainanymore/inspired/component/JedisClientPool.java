@@ -2,7 +2,6 @@ package com.nopainanymore.inspired.component;
 
 
 import com.nopainanymore.inspired.jedis.JedisClient;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
@@ -18,8 +17,7 @@ import java.util.Map;
 @Profile("redisPool")
 public class JedisClientPool implements JedisClient {
 
-    @Autowired
-    private JedisPool jedisPool;
+    private JedisPool jedisPool = ApplicationUtil.getBeanByName(JedisPool.class);
 
     @Override
     public String set(String key, String value) {
@@ -134,7 +132,6 @@ public class JedisClientPool implements JedisClient {
         Jedis jedis = jedisPool.getResource();
         Long result = jedis.incr(key);
         jedis.close();
-
         return result;
     }
 
@@ -143,7 +140,6 @@ public class JedisClientPool implements JedisClient {
         Jedis jedis = jedisPool.getResource();
         Long result = jedis.hset(key, field, value);
         jedis.close();
-
         return result;
     }
 
@@ -152,7 +148,6 @@ public class JedisClientPool implements JedisClient {
         Jedis jedis = jedisPool.getResource();
         String result = jedis.hget(key, field);
         jedis.close();
-
         return result;
     }
 
@@ -161,7 +156,14 @@ public class JedisClientPool implements JedisClient {
         Jedis jedis = jedisPool.getResource();
         Map<String, String> result = jedis.hgetAll(key);
         jedis.close();
+        return result;
+    }
 
+    @Override
+    public Long incrBy(String key, Long incr) {
+        Jedis jedis = jedisPool.getResource();
+        Long result = jedis.incrBy(key, incr);
+        jedis.close();
         return result;
     }
 
@@ -170,7 +172,6 @@ public class JedisClientPool implements JedisClient {
         Jedis jedis = jedisPool.getResource();
         Long result = jedis.hdel(key, fields);
         jedis.close();
-
         return result;
     }
 

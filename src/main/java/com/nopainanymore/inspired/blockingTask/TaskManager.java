@@ -1,6 +1,8 @@
 package com.nopainanymore.inspired.blockingTask;
 
+import com.nopainanymore.inspired.component.ApplicationUtil;
 import com.nopainanymore.inspired.jedis.JedisClient;
+import com.nopainanymore.inspired.jedis.JedisClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +20,8 @@ public class TaskManager {
 
     private final static String TASK_REDIS_KEY = "task_key";
 
+    private final static String REDIS_RESPONSE_NULL = "null";
+
     private static volatile TaskManager taskManager;
 
     private JedisClient jedisClient;
@@ -29,6 +33,10 @@ public class TaskManager {
     private TaskManager() {
     }
 
+    public static void start() {
+        taskManager.startTask();
+    }
+
     public static void shutdown() {
         taskManager.stopRunner();
     }
@@ -37,12 +45,12 @@ public class TaskManager {
         tRunning = false;
     }
 
-    public static TaskManager getTaskManager(JedisClient jedisClient) {
+    public static TaskManager getTaskManager() {
         if (taskManager == null) {
             synchronized (TaskManager.class) {
                 if (taskManager == null) {
                     taskManager = new TaskManager();
-                    taskManager.jedisClient = jedisClient;
+                    taskManager.jedisClient = ApplicationUtil.getBeanByName(JedisClientImpl.class);
                     taskHolder = new LinkedBlockingQueue<>(Integer.MAX_VALUE);
                     taskManager.startTask();
                 }
@@ -80,7 +88,7 @@ public class TaskManager {
     private void checkTask() {
         String redisNum = jedisClient.get(TASK_REDIS_KEY);
         long currentTaskNumber;
-        if (redisNum.equals("null")) {
+        if (REDIS_RESPONSE_NULL.equals(redisNum)) {
             currentTaskNumber = 0L;
         } else {
             currentTaskNumber = Long.parseLong(redisNum);
