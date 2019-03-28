@@ -1,10 +1,5 @@
 package com.nopainanymore.inspired.component;
 
-/**
- * @author nopainanymore
- * @time 2019-03-27 22:39
- */
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -13,10 +8,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+
 /**
  * spring上下文配置
- *
- * @author Mingchenchen
+ * @author nopainanymore
+ * @time 2019-03-27 22:39
  */
 @Component
 public class ApplicationUtil implements ApplicationContextAware {
